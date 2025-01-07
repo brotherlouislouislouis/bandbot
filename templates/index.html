@@ -1,0 +1,324 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BandBot</title> <!-- Site title set to BandBot -->
+
+    <!-- Favicon -->
+    <link rel="icon" href="/static/bandbot.png" type="image/png">
+
+    <style>
+        @font-face {
+            font-family: 'Dotrice';
+            src: url('/static/Dotrice.otf') format('opentype');
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: space-between;
+        }
+
+        #pimpbot {
+            width: 200px;
+            position: relative;
+            margin: 20px auto;
+            animation: idleDance 1s infinite;
+        }
+
+        @keyframes idleDance {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        #output-text {
+            font-family: 'Dotrice', sans-serif;
+            font-size: 1.5rem;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #3700b3;
+        }
+
+        #copy-btn {
+            margin-top: 20px;
+            font-size: 1rem;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #copy-btn:hover {
+            background-color: #3700b3;
+        }
+
+        #puge-container {
+            margin-top: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        #puge {
+            width: 605px;
+            height: 505px;
+            margin: auto;
+            display: none;
+            animation: slideUp 1s ease-out;
+        }
+
+        #text-from-bottom {
+            font-family: 'Dotrice', sans-serif;
+            font-size: 1.5rem;
+            color: #000000;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 380px;
+            height: 240px;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            vertical-align: middle;
+            line-height: 1.5;
+            display: none;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        #download-btn {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .social-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-buttons a {
+            padding: 10px 20px;
+            background-color: #1da1f2; /* Twitter color */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .social-buttons a:hover {
+            background-color: #0d8bf2; /* Twitter hover color */
+        }
+
+        .social-buttons a.telegram {
+            background-color: #0088cc; /* Telegram color */
+        }
+
+        .social-buttons a.telegram:hover {
+            background-color: #0072a3;
+        }
+
+        .social-buttons a.dexscreener {
+            background-color: #ff2a68; /* Dexscreener color */
+        }
+
+        .social-buttons a.dexscreener:hover {
+            background-color: #f52261;
+        }
+
+        #download-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <h1>Bandana Bot AI</h1>
+    <img id="pimpbot" src="/static/bandbot.png" alt="Pimpbot">
+
+    <button onclick="getJoke()">Poke BandBot</button>
+    <div id="output-text"></div>
+
+    <!-- Click to Copy Button -->
+    <button id="copy-btn" onclick="copyText()">Click to Copy Contract Address</button>
+
+    <!-- Social Media Buttons -->
+    <div class="social-buttons">
+        <a href="https://twitter.com" target="_blank">Twitter</a>
+        <a href="https://telegram.org" target="_blank" class="telegram">Telegram</a>
+        <a href="https://dexscreener.com" target="_blank" class="dexscreener">Dexscreener</a>
+    </div>
+
+    <div id="puge-container">
+        <img id="puge" src="/static/buge.png" alt="Puge">
+        <div id="text-from-bottom"></div>
+    </div>
+
+    <button id="download-btn" onclick="downloadImage()">Keep the receipt</button>
+
+    <script>
+        async function getJoke() {
+            const outputText = document.getElementById('output-text');
+            const textFromBottom = document.getElementById('text-from-bottom');
+            const puge = document.getElementById('puge');
+            const downloadBtn = document.getElementById('download-btn');
+
+            try {
+                const response = await fetch('/random_joke');
+                const data = await response.json();
+
+                if (data.joke) {
+                    const joke = data.joke;
+
+                    // Display joke in text container
+                    outputText.textContent = joke;
+
+                    // Animate Pimpbot and show the joke
+                    const pimpbot = document.getElementById('pimpbot');
+                    pimpbot.style.animation = 'shake 0.5s infinite';
+
+                    setTimeout(() => {
+                        pimpbot.style.animation = 'idleDance 1s infinite';
+                    }, 3000);
+
+                    // Play the joke using speech synthesis
+                    const utterance = new SpeechSynthesisUtterance(joke);
+                    utterance.voice = selectVoice(); // Select voice
+                    speechSynthesis.speak(utterance);
+
+                    // Show Puge and display joke text from its bottom
+                    puge.style.display = 'block';
+                    textFromBottom.textContent = joke;
+                    textFromBottom.style.display = 'block';
+                    downloadBtn.style.display = 'inline-block';
+                } else {
+                    outputText.textContent = "Oops! No joke found.";
+                }
+            } catch (error) {
+                console.error(error);
+                outputText.textContent = "An error occurred. Please try again.";
+            }
+        }
+
+        function selectVoice() {
+            const voices = speechSynthesis.getVoices();
+            let selectedVoice = voices.find(voice => voice.name.toLowerCase().includes('robot')) || 
+                                voices.find(voice => voice.name.toLowerCase().includes('man'));
+            return selectedVoice || voices[0]; // Default to first if no match
+        }
+
+        function downloadImage() {
+            const puge = document.getElementById('puge');
+            const text = document.getElementById('text-from-bottom').textContent;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 605;
+            canvas.height = 505;
+            const ctx = canvas.getContext('2d');
+
+            const image = new Image();
+            image.src = puge.src;
+
+            image.onload = () => {
+                ctx.drawImage(image, 0, 0);
+
+                const textAreaWidth = 380;
+                const textAreaHeight = 240;
+                const textX = (canvas.width - textAreaWidth) / 2;
+                const textY = (canvas.height - textAreaHeight) / 2;
+
+                ctx.font = "24px 'Dotrice'";
+                ctx.fillStyle = "#333";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "top";
+                ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+                ctx.shadowBlur = 4;
+
+                function wrapText(text, x, y, maxWidth, lineHeight) {
+                    let words = text.split(' ');
+                    let line = '';
+                    let lines = [];
+
+                    for (let i = 0; i < words.length; i++) {
+                        let testLine = line + words[i] + ' ';
+                        let testWidth = ctx.measureText(testLine).width;
+
+                        if (testWidth > maxWidth && i > 0) {
+                            lines.push(line);
+                            line = words[i] + ' ';
+                        } else {
+                            line = testLine;
+                        }
+                    }
+
+                    lines.push(line);
+
+                    const totalTextHeight = lines.length * lineHeight;
+                    const textOffsetY = textY + (textAreaHeight - totalTextHeight) / 2;
+
+                    for (let j = 0; j < lines.length; j++) {
+                        ctx.fillText(lines[j], x, textOffsetY + j * lineHeight);
+                    }
+                }
+
+                const lineHeight = 30;
+                wrapText(text, canvas.width / 2, textY, textAreaWidth, lineHeight);
+
+                const link = document.createElement('a');
+                link.download = 'puge_with_text.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+        }
+
+        function copyText() {
+            const textToCopy = "adsasdsdadsdspump";  // The text you want to copy
+
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => alert("Text copied to clipboard"))
+                .catch(err => console.error("Error copying text: ", err));
+        }
+    </script>
+
+</body>
+</html>
